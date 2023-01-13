@@ -27,10 +27,11 @@
 	>	
 	</PostList>
 	<div v-else>Waiting loading</div>
-	<MyNav
+	<!-- <MyNav
 	:totalPages="totalPages"
 	@switchPage="switchPage"
-	></MyNav>
+	></MyNav> -->
+	<div ref="observer" class="observer"></div>
 </template>
 
 <script>
@@ -66,10 +67,10 @@
 			PostList, PostForm
 		},
 		methods: {
-			switchPage(page){
+			/*switchPage(page){
 				this.page = page;
 				
-			},
+			},*/
 			deletePost(post){
 				this.posts.forEach((itemPost, idx)=>{
 					if(itemPost.id === post.id) {
@@ -87,28 +88,61 @@
 			removeNonDigitCharacters() {
 			    this.modificatorValue = this.modificatorValue.replace(/[^0-9]+/g, '');
 		  	},
-		  	async fetchPosts(){
-		  		try {
-		  			this.isPostLoading = true;	
-		  			setTimeout(async ()=>{
-		  			const response = await axios.get('https://jsonplaceholder.typicode.com/posts', {
-		  					params: {
-		  						_page: this.page,
-		  						_limit: this.limit
-		  					}	
-		  			});
-		  			this.totalPages = Math.ceil(response.headers['x-total-count'] / this.limit);
-		  			this.posts = response.data;
-		  			this.isPostLoading = false;
-		  			}, 1000)
-		  		} catch(e) {
-		  			alert('Error')
-		  		} 
-		  	}
+	  	async fetchPosts(){
+	  		try {
+	  			this.isPostLoading = true;	
+	  			
+	  			const response = await axios.get('https://jsonplaceholder.typicode.com/posts', {
+	  					params: {
+	  						_page: this.page,
+	  						_limit: this.limit
+	  					}	
+	  			});
+	  			this.totalPages = Math.ceil(response.headers['x-total-count'] / this.limit);
+	  			this.posts = response.data;
+	  			this.isPostLoading = false;
+	  			
+	  		} catch(e) {
+	  			alert('Error')
+	  		} 
+	  	},
+	  	async loadMorePosts(){
+	  		try {
+	  			this.page = this.page + 1;
+	  			setTimeout(async ()=>{
+	  			const response = await axios.get('https://jsonplaceholder.typicode.com/posts', {
+	  					params: {
+	  						_page: this.page,
+	  						_limit: this.limit
+	  					}	
+	  			});
+	  			this.totalPages = Math.ceil(response.headers['x-total-count'] / this.limit);
+	  			this.posts = [...this.posts, ...response.data];
+	  			
+	  			}, 1000)
+	  		} catch(e) {
+	  			alert('Error')
+	  		} 
+	  	}
 		},
 		mounted(){
-			this.fetchPosts();
-		},
+				this.fetchPosts();
+
+				console.log(this.$refs.observer)
+				let options = { 
+				  rootMargin: '0px',
+				  threshold: 1.0
+				}
+				
+				let callback = (entries, observer) => {
+					
+					if(entries[0].isIntersecting ){
+						this.loadMorePosts()
+					}
+				}
+				let observer = new IntersectionObserver(callback, options);
+				observer.observe(this.$refs.observer);
+			},
 		computed: {
 			sortedPosts(){
 				return [...this.posts].sort((post1, post2) => post1[this.selectedSort]?.localeCompare(this.selectedSort)
@@ -125,9 +159,9 @@
 					return post1[newValue]?.localeCompare(post2[newValue])
 				})
 			},*/
-			page(){//фетч отрабатывает каждый раз, как меняется page, круто!
+			/*page(){//фетч отрабатывает каждый раз, как меняется page, круто!
 				this.fetchPosts()
-			}
+			}*/
 		}
 	}
 </script>
@@ -136,5 +170,10 @@
 	.app_btns{
 		display: flex;
 		justify-content: space-between;
+	}
+
+	.observer {
+		height: 30px;
+		background: grey;
 	}
 </style>
