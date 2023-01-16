@@ -32,8 +32,10 @@
 				this.currentPage = page;
 				console.log(this.currentPage)
 				this.$emit("switchPage", page)
-			}
-		}
+			},
+
+		},
+		
 	}
 
 </script>

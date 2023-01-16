@@ -1,5 +1,6 @@
 <template>
-	<div class="post">
+	<div class="post" 
+	>
 			<div class="post-id" 
 			>{{post.id}}</div>
 			<div class="post-title" 
@@ -7,6 +8,9 @@
 			<div class="post-body" 
 			>{{post.body}}</div>
 			<div class="post_btns">
+				
+				<router-link 
+				:to="{name: 'PostIdPage', params: {id: post.id, post: post.body}}">Press</router-link>
 				<MyButton @click="deletePost">Delete</MyButton>
 			</div>
 			<hr>
